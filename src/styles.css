@@ -1,0 +1,9 @@
+.App {
+  font-family: sans-serif;
+  text-align: center;
+}
+
+.Item {
+ border-width: 2px,
+  border:10px solid #555;
+}
