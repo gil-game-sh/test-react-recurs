@@ -54,7 +54,7 @@ class Item extends React.Component<IITemProps, IITemState> {
   }
   private onChildDimChanged(w: number, h: number) {
     console.log("onChildDimChanged" + w + " " + h);
-    this.setState({ w: w * 2, h: h * 2 });
+    //    this.setState({ w: w * 2, h: h * 2 });
   }
 
   public render() {
