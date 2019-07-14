@@ -7,12 +7,14 @@ import "@blueprintjs/core/lib/css/blueprint.css";
 import { bool } from "prop-types";
 //import "@blueprintjs/core/lib/css/blueprint-icons.css"
 
+  // #################################################################
+
 interface IRecursiveItemProps {
   name: string;
   x: number;
   y: number;
   depth?: number;
-  onDimChanged?: (name:string, w: number, h: number) => void;
+  onDimChanged?: (name:string, w: number, h: number, t:number, l:number) => void;
 }
 
 interface IRecursiveItemState {
@@ -25,15 +27,24 @@ interface IRecursiveItemState {
   updateDimPending:number;
 }
 
+  // #################################################################
+
 class RecursiveItem extends React.Component<IRecursiveItemProps, IRecursiveItemState> {
+  private static MarginLeft    = 20;
+  private static MarginRight   = 20;
+  private static MarginTop     = 10;
+  private static MarginBottom  = 20;
+  private static DefaultWidth  = 100;
+  private static DefaultHeight = 100;
+  private static DefaultBorderWitdh = 1;
   public constructor(props: IRecursiveItemProps) {
     super(props);
     console.log("constructor() " + props.name +" - " + props.depth);
 
     this.state = {
       name: props.name+' - ' + (props.depth !== undefined ? props.depth : 0),
-      w: 50,
-      h: 50,
+      w: RecursiveItem.DefaultWidth,
+      h: RecursiveItem.DefaultHeight,
       depth: props.depth !== undefined ? props.depth : 0,
       renderedW: 0,
       renderedH: 0,
@@ -41,15 +52,19 @@ class RecursiveItem extends React.Component<IRecursiveItemProps, IRecursiveItemS
     };
   }
 
+  // -------------------------------------------------------------------
+
   public componentDidMount() {
     this.setState((state)=> ({renderedW:state.w, renderedH:state.h}));
 
     console.log("componentDidMount() " + this.state.name +" | {" + this.state.w + "," + this.state.h + "}");
     if (this.props.onDimChanged !== undefined) {
       console.log("componentDidMount() " + this.state.name +" | propagate new dim to parent {" + this.state.w + "," + this.state.h + "}");
-      this.props.onDimChanged(this.state.name, this.state.w, this.state.h);
+      this.props.onDimChanged(this.state.name, this.state.w, this.state.h, this.props.x, this.props.y);
     }
   }
+
+  // -------------------------------------------------------------------
 
   public shouldComponentUpdate(nextProps:IRecursiveItemProps, nextState:IRecursiveItemState)
   {
@@ -57,6 +72,8 @@ class RecursiveItem extends React.Component<IRecursiveItemProps, IRecursiveItemS
     console.log("shouldComponentUpdate() " + this.state.name +" | previous {" + this.state.w + "," + this.state.h + "} / new {" + nextState.w + "," + nextState.h + "} returns " + r);
     return (r);
   }
+
+  // -------------------------------------------------------------------
 
   public componentDidUpdate() {
     console.log("componentDidUpdate() " + this.state.name +" | previous {" + this.state.renderedW + "," + this.state.renderedH + "} / new {" + this.state.w + "," + this.state.h + "} - updateDimPending:"+ this.state.updateDimPending);
@@ -67,7 +84,7 @@ class RecursiveItem extends React.Component<IRecursiveItemProps, IRecursiveItemS
       this.setState( (state) => ({ updateDimPending: state.updateDimPending - 1}) );
       if (this.props.onDimChanged !== undefined) {
         console.log("componentDidUpdate() " + this.state.name +" | propagate new dim to parent {" + this.state.w + "," + this.state.h + "}");
-        this.props.onDimChanged(this.state.name, this.state.w, this.state.h);
+        this.props.onDimChanged(this.state.name, this.state.w, this.state.h, this.props.x, this.props.y);
       }
       else{
         console.log("componentDidUpdate() " + this.state.name +" | cannot propagate new dim to parent (no callback)");
@@ -80,32 +97,37 @@ class RecursiveItem extends React.Component<IRecursiveItemProps, IRecursiveItemS
     this.setState((state)=> ({renderedW:state.w, renderedH:state.h}));
   }
 
-  public onChildDimChanged(name:string, width: number, height: number) {
-    const w2 = this.state.w + width*2;
-    const h2 = this.state.w + height*2;
+  // -------------------------------------------------------------------
+
+  public onChildDimChanged(name:string, width: number, height: number, left:number, top:number) {
+    const w2 = Math.max(this.state.w, left + RecursiveItem.MarginLeft + width + RecursiveItem.MarginRight);
+    const h2 = Math.max(this.state.h, top  + RecursiveItem.MarginTop + height + RecursiveItem.MarginBottom);
+
     console.log("onChildDimChanged() " + this.state.name + " | child: "+ name + " {" + width + "," + height + "} => {" + w2 + "," + h2 +"} - updateDimPending:"+ this.state.updateDimPending + " => "+ (this.state.updateDimPending+1));
 
     this.setState( (state) => ({ 
-      w: state.w + width, 
-      h: state.h + height,
+      w: Math.max(state.w, left + RecursiveItem.MarginLeft + width + RecursiveItem.MarginRight),
+      h: Math.max(state.h, top + RecursiveItem.MarginTop + height + RecursiveItem.MarginBottom),
       updateDimPending: state.updateDimPending + 1 }) );
   }
 
+  // -------------------------------------------------------------------
+
   public render() {
     console.log("render() " + this.state.name +" {" + this.state.w + "," + this.state.h + "}");
-    if (this.state.depth < 3) {
+    if (this.state.depth < 5) {
       return (
         <div
           className="Item"
           style={{
             position: "absolute",
-            top: this.props.y,
-            left: this.props.x,
+            top: RecursiveItem.MarginTop + this.props.y,
+            left: RecursiveItem.MarginLeft + this.props.x,
             width: this.state.w,
             height: this.state.h,
             backgroundColor: Colors.COBALT4,
             borderColor: Colors.DARK_GRAY1,
-            borderWidth: 5
+            borderWidth: RecursiveItem.DefaultBorderWitdh
           }}
         >
           <Tag>
@@ -115,7 +137,14 @@ class RecursiveItem extends React.Component<IRecursiveItemProps, IRecursiveItemS
             x={5}
             y={20}
             name={"Hello"}
-            onDimChanged={(name,w,h) => this.onChildDimChanged(name,w,h)}
+            onDimChanged={(name,w,h,x,y) => this.onChildDimChanged(name,w,h,x,y)}
+            depth={this.state.depth + 1}
+          />
+          <RecursiveItem
+            x={100}
+            y={100}
+            name={"Coco"}
+            onDimChanged={(name,w,h,x,y) => this.onChildDimChanged(name,w,h,x,y)}
             depth={this.state.depth + 1}
           />
         </div>
@@ -126,13 +155,13 @@ class RecursiveItem extends React.Component<IRecursiveItemProps, IRecursiveItemS
           className="Item"
           style={{
             position: "absolute",
-            top: this.props.y,
-            left: this.props.x,
+            top: RecursiveItem.MarginTop + this.props.y,
+            left: RecursiveItem.MarginLeft + this.props.x,
             width: this.state.w,
             height: this.state.h,
             backgroundColor: Colors.COBALT4,
             borderColor: Colors.DARK_GRAY1,
-            borderWidth: 5
+            borderWidth: RecursiveItem.DefaultBorderWitdh
           }}
         >
           <Tag>
@@ -144,6 +173,8 @@ class RecursiveItem extends React.Component<IRecursiveItemProps, IRecursiveItemS
   }
 }
 
+  // #################################################################
+
 function App() {
   return (
     <div className="App">
@@ -151,6 +182,8 @@ function App() {
     </div>
   );
 }
+
+  // #################################################################
 
 const rootElement = document.getElementById("root");
 render(<App />, rootElement);
