@@ -15,14 +15,6 @@ interface IRecursiveItemProps {
   onDimChanged?: (name:string, w: number, h: number) => void;
 }
 
-interface IChild{
-  key:string;
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-}
-
 interface IRecursiveItemState {
   name: string;
   w: number;
@@ -30,10 +22,8 @@ interface IRecursiveItemState {
   depth: number;
   renderedH: number;
   renderedW: number;
-  children?:IChild[];
   updateDimPending:number;
 }
-
 
 class RecursiveItem extends React.Component<IRecursiveItemProps, IRecursiveItemState> {
   public constructor(props: IRecursiveItemProps) {
@@ -47,7 +37,6 @@ class RecursiveItem extends React.Component<IRecursiveItemProps, IRecursiveItemS
       depth: props.depth !== undefined ? props.depth : 0,
       renderedW: 0,
       renderedH: 0,
-      children:undefined,
       updateDimPending: 0
     };
   }
@@ -96,7 +85,6 @@ class RecursiveItem extends React.Component<IRecursiveItemProps, IRecursiveItemS
     const h2 = this.state.w + height*2;
     console.log("onChildDimChanged() " + this.state.name + " | child: "+ name + " {" + width + "," + height + "} => {" + w2 + "," + h2 +"} - updateDimPending:"+ this.state.updateDimPending + " => "+ (this.state.updateDimPending+1));
 
-    // following form is prefered because 
     this.setState( (state) => ({ 
       w: state.w + width, 
       h: state.h + height,
