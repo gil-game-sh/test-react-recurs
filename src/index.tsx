@@ -2,7 +2,6 @@ import * as React from "react";
 import { render } from "react-dom";
 import "./styles.css";
 
-import "@blueprintjs/core/lib/css/blueprint.css";
 import { RecursiveItem } from "./ReactiveItem";
 
 
