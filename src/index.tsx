@@ -178,7 +178,7 @@ class RecursiveItem extends React.Component<IRecursiveItemProps, IRecursiveItemS
 function App() {
   return (
     <div className="App">
-      <RecursiveItem x={5} y={5} name={"Hello"} />
+      <RecursiveItem x={50} y={50} name={"Root"} />
     </div>
   );
 }
