@@ -4,8 +4,6 @@ import { Tag, Colors } from "@blueprintjs/core";
 import "./styles.css";
 
 import "@blueprintjs/core/lib/css/blueprint.css";
-import { bool } from "prop-types";
-//import "@blueprintjs/core/lib/css/blueprint-icons.css"
 
   // #################################################################
 
