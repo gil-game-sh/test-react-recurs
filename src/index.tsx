@@ -2,7 +2,7 @@ import * as React from "react";
 import { render } from "react-dom";
 import "./styles.css";
 
-import { RecursiveItem } from "./ReactiveItem";
+import { RecursiveItem } from "./RecursiveItem";
 
 
   // #################################################################
